@@ -111,7 +111,7 @@ def main ():
         spec_selection=st.sidebar.selectbox("Select specialization for legend",options=spec_courses_fmt)
         color = spec_courses_fmt[spec_selection]
     else:
-        color = None if size=="None" else color
+        color = None if color=="None" else color
     
     fig = px.scatter(agg, 
                     x=x, 
@@ -133,8 +133,8 @@ def main ():
         fig.update_layout(yaxis_range=[1,5])
     
     fig.update_layout(xaxis_title=x, yaxis_title=y)
+
     st.write(fig)
-    print(agg.head())
 
 if __name__=="__main__":
     main()
