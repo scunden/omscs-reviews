@@ -76,7 +76,7 @@ def main ():
     for spec in spec_courses:
         agg[spec] = np.where(agg["Course Code"].isin(spec_courses[spec]),"In-Spec","Out-of-Spec")
 
-    st.title("🎲 OMSCS Reviews Visualization")
+    st.title("🎫 OMSCS Reviews Visualization")
     st.header("Filter the reviews and select your parameters in the sidebar!")
 
     ## Filters
@@ -98,7 +98,7 @@ def main ():
     options = ["Avg. Difficulty","Avg. Rating","Avg. Workload (Hrs)","No. of Reviews"]
     color_options=["No. of Reviews","Avg. Workload (Hrs)","Specialization"]
 
-    st.sidebar.markdown("## 🎲 Select Parameter to Visualize")
+    st.sidebar.markdown("## 🔧 Select Parameter to Visualize")
 
     x=st.sidebar.selectbox("Select x-axis parameter",options=options, index=0)
     y=st.sidebar.selectbox("Select y-axis parameter",options=options, index=1)
