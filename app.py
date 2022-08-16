@@ -24,6 +24,8 @@ def scrape_reviews():
         c_reviews["Course Code"] = code.replace("-"," ")
         reviews = pd.concat([reviews, c_reviews])
     
+    reviews.loc[:, ['rating','difficulty','workload']] = reviews[['rating','difficulty','workload']].round(2)
+
     return reviews
 
 def scrape_specs():
@@ -63,6 +65,7 @@ def main ():
         'workload':np.nanmean,
         'rating':np.nanmean,
         'id':'count'}).reset_index()
+    agg.loc[:, ['rating','difficulty','workload']] = agg[['rating','difficulty','workload']].round(2)
 
     agg = agg.rename({
         'difficulty':"Avg. Difficulty",
