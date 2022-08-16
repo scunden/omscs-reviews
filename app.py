@@ -78,7 +78,7 @@ def main ():
     for spec in spec_courses:
         agg[spec] = np.where(agg["Course Code"].isin(spec_courses[spec]),"In-Spec","Out-of-Spec")
 
-    st.title("🎫 OMSCS Reviews Visualization")
+    st.title("OMSCS Reviews Visualization")
     st.header("Filter the reviews and select your parameters in the sidebar!")
 
     ## Filters
