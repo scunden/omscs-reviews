@@ -5,74 +5,32 @@ import numpy as np
 import json
 import streamlit as st
 import plotly.express as px
+import scrape as sc
 
+def agg_reviews():
+    reviews = pd.read_csv('OMSHub.csv')
 
-def scrape_reviews():
-    url = 'https://www.omscentral.com/'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-
-    data = soup.select_one('#__NEXT_DATA__')
-    courses = json.loads(data.contents[0])['props']['pageProps']['courses']
-
-    reviews = pd.DataFrame()
-
-    for i in range(len(courses)):
-        course, code = courses[i]['name'], courses[i]['code']
-        c_reviews = pd.json_normalize(courses[i]['reviews'])
-        c_reviews["Course Name"] = course
-        c_reviews["Course Code"] = code.replace("-"," ")
-        reviews = pd.concat([reviews, c_reviews])
-    
-    reviews.loc[:, ['rating','difficulty','workload']] = reviews[['rating','difficulty','workload']].round(2)
-
-    return reviews
-
-def scrape_specs():
-    spec_url="https://omscs.gatech.edu/specialization-"
-    
-
-    specs = [
-        "computational-perception-robotics",
-         "computing-systems",
-         "interactive-intelligence",
-         "machine-learning"
-         ]
-    spec_courses={}
-
-    for spec in specs:
-        spec_response = requests.get(spec_url+spec)
-        spec_soup = BeautifulSoup(spec_response.content, 'html.parser')
-        spec_courses_ls = []
-
-        for item in spec_soup.find_all("div", class_="body with-aside")[0].find_all('li'):
-            course_key = item.text.strip()
-            course_code = " ".join(course_key.split(" ")[:2]).strip()
-            spec_courses_ls.append(course_code)
-        
-        spec_courses.update({spec:spec_courses_ls})
-
-    return spec_courses
-
-def main ():
-    # Scrape reviews and specs
-    reviews = scrape_reviews()
-    spec_courses = scrape_specs()
-    spec_courses_fmt = {spec.replace("-"," ").title():spec for spec in spec_courses.keys()}
-    
     agg = reviews.groupby(["Course Name","Course Code"]).agg({
         'difficulty':np.nanmean,
         'workload':np.nanmean,
         'rating':np.nanmean,
-        'id':'count'}).reset_index()
+        'reviews':'sum'}).reset_index()
     agg.loc[:, ['rating','difficulty','workload']] = agg[['rating','difficulty','workload']].round(2)
 
     agg = agg.rename({
         'difficulty':"Avg. Difficulty",
         'rating':"Avg. Rating",
         'workload':"Avg. Workload (Hrs)",
-        'id':'No. of Reviews'
+        'reviews':'No. of Reviews'
     }, axis=1)
+
+    return agg
+
+def main ():
+    # Scrape course specialization
+    agg = agg_reviews()
+    spec_courses = sc.scrape_specs()
+    spec_courses_fmt = {spec.replace("-"," ").title():spec for spec in spec_courses.keys()}
 
     # Add spec to review agg table
     for spec in spec_courses:
